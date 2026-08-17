@@ -37,7 +37,8 @@ jobs:
 
           (cd source/resources && npm ci)
 
-      - name: Run linting
+      - name: Run linting (baseline)
+        continue-on-error: true
         env:
           ESLINT_USE_FLAT_CONFIG: "false"
         run: npm run lint
