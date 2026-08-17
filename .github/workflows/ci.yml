@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          npm ci
+          (cd source/lambda/utilsLayer && npm ci)
+
+          for directory in source/lambda/services/*/; do
+            echo "Installing dependencies in $directory"
+            (cd "$directory" && npm ci)
+          done
+
+          (cd source/resources && npm ci)
+
+      - name: Run linting (baseline)
+        continue-on-error: true
+        env:
+          ESLINT_USE_FLAT_CONFIG: "false"
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm test
