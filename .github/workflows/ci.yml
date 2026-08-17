@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: "**/package-lock.json"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          while IFS= read -r -d '' lockfile; do
+            directory="$(dirname "$lockfile")"
+            echo "Installing dependencies in $directory"
+            (cd "$directory" && npm ci)
+          done < <(find . -name package-lock.json -not -path "*/node_modules/*" -print0)
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm test
