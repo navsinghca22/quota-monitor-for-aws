@@ -38,6 +38,8 @@ jobs:
           (cd source/resources && npm ci)
 
       - name: Run linting
+        env:
+          ESLINT_USE_FLAT_CONFIG: "false"
         run: npm run lint
 
       - name: Run unit tests
