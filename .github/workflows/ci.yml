@@ -24,7 +24,7 @@ jobs:
           cache: npm
           cache-dependency-path: "**/package-lock.json"
 
-      -       - name: Install dependencies
+      - name: Install dependencies
         shell: bash
         run: |
           npm ci
